@@ -264,9 +264,22 @@ public abstract class AbstractRewritePomsPhase
                                     ReleaseResult result, boolean simulate )
         throws ReleaseExecutionException, ReleaseFailureException
     {
+        // Get the project root.
+        MavenProject projectRoot = project;
+        while ( projectRoot.getParent() != null ) 
+        {
+            projectRoot = projectRoot.getParent();
+        }
+
+        // Create a list of all projects.
+        final List<MavenProject> allProjects = new ArrayList<MavenProject>();
+        allProjects.add( projectRoot );
+        allProjects.addAll( projectRoot.getCollectedProjects() );
+        
         Namespace namespace = rootElement.getNamespace();
         Map<String, String> mappedVersions = getNextVersionMap( releaseDescriptor );
-        Map<String, String> originalVersions = getOriginalVersionMap( releaseDescriptor, reactorProjects, simulate );
+        //Map<String, String> originalVersions = getOriginalVersionMap( releaseDescriptor, reactorProjects, simulate );
+        Map<String, String> originalVersions = getOriginalVersionMap( releaseDescriptor, allProjects, simulate );
         @SuppressWarnings( "unchecked" )
         Map<String, Map<String, String>> resolvedSnapshotDependencies =
             releaseDescriptor.getResolvedSnapshotDependencies();
